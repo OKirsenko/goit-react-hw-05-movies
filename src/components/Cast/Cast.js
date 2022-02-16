@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import fetchAPI from 'services/fetchTrending';
 import s from './Cast.module.css';
 
 export default function Cast() {
@@ -8,10 +8,7 @@ export default function Cast() {
   const { movieId } = useParams();
   const imgUrl = 'https://image.tmdb.org/t/p/w400';
   useEffect(() => {
-    axios
-      .get(
-        `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=72b81a8bb303f29cc8e049d7d5cd52a0&language=en-US`
-      )
+    fetchAPI('cast', movieId)
       .then(res => res.data.cast)
       .then(setCast);
   }, [movieId]);

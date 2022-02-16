@@ -5,29 +5,27 @@ import {
   useHistory,
   useRouteMatch,
 } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import s from './MovieDetailsPage.module.css';
-import Cast from 'components/Cast/Cast';
-import Reviews from 'components/Reviews/Reviews';
+import fetchAPI from 'services/fetchTrending';
+const Cast = lazy(() => import('components/Cast/Cast'));
+const Reviews = lazy(() => import('components/Reviews/Reviews'));
 
 export default function MovieDetailsPage() {
   const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
   const { url } = useRouteMatch();
   const history = useHistory();
+
   useEffect(() => {
-    axios
-      .get(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=72b81a8bb303f29cc8e049d7d5cd52a0`
-      )
+    fetchAPI('movie', movieId)
       .then(res => res.data)
       .then(setMovie);
   }, [movieId]);
 
   const imgUrl = () => {
     if (!movie.poster_path) {
-      return 'http://placehold.it/300x600/808080&text=No_poster';
+      return 'http://placehold.it/300x400/808080&text=No_poster';
     }
     return `https://image.tmdb.org/t/p/w400${movie.poster_path}`;
   };
@@ -81,12 +79,14 @@ export default function MovieDetailsPage() {
           </ul>
         </div>
       )}
-      <Route path="/movies/:movieId/cast">
-        <Cast />
-      </Route>
-      <Route path="/movies/:movieId/reviews">
-        <Reviews />
-      </Route>
+      <Suspense fallback={<h1>loading...</h1>}>
+        <Route path="/movies/:movieId/cast">
+          <Cast />
+        </Route>
+        <Route path="/movies/:movieId/reviews">
+          <Reviews />
+        </Route>
+      </Suspense>
     </div>
   );
 }

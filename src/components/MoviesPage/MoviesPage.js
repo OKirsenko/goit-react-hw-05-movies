@@ -1,8 +1,8 @@
 import s from './MoviesPage.module.css';
 import { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import fetchAPI from 'services/fetchTrending';
 
 export default function MoviesPage() {
   const history = useHistory();
@@ -32,13 +32,11 @@ export default function MoviesPage() {
     if (!movieName) {
       return;
     }
-    axios
-      .get(
-        `https://api.themoviedb.org/3/search/movie?api_key=72b81a8bb303f29cc8e049d7d5cd52a0&query=${movieName}`
-      )
+    fetchAPI('search', movieName)
       .then(res => res.data.results)
       .then(setMovies);
   }, [movieName]);
+
   return (
     <div className={s.container}>
       <form className={s.form} onSubmit={handleSubmit}>
